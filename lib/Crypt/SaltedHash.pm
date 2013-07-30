@@ -6,7 +6,9 @@ use Digest       ();
 
 use vars qw($VERSION);
 
-$VERSION = '0.06';
+$VERSION = '0.06_02';
+
+=encoding latin1
 
 =head1 NAME
 
@@ -235,7 +237,7 @@ Returns the salt in binary form.
 sub salt_bin {
     my $self = shift;
 
-    return $self->{salt} =~ m!^HEX{(.*)}$!i ? pack( "H*", $1 ) : $self->{salt};
+    return $self->{salt} =~ m!^HEX\{(.*)\}$!i ? pack( "H*", $1 ) : $self->{salt};
 }
 
 =item B<salt_hex()>
@@ -247,7 +249,7 @@ Returns the salt in hexadecimal form ('HEX{...}')
 sub salt_hex {
     my $self = shift;
 
-    return $self->{salt} =~ m!^HEX{(.*)}$!i
+    return $self->{salt} =~ m!^HEX\{(.*)\}$!i
       ? $self->{salt}
       : 'HEX{' . join( '', unpack( 'H*', $self->{salt} ) ) . '}';
 }
@@ -288,9 +290,10 @@ sub validate {
     $hasheddata =~ s!^\s+!!;
     $hasheddata =~ s!\s+$!!;
 
-    my $scheme    = uc( &__get_pass_scheme($hasheddata) );
+    my $scheme    = &__get_pass_scheme($hasheddata);
+    $scheme       = uc( $scheme ) if $scheme;
     my $algorithm = &__make_algorithm($scheme);
-    my $hash      = &__get_pass_hash($hasheddata);
+    my $hash      = &__get_pass_hash($hasheddata) || '';
     my $salt      = &__extract_salt( $hash, $salt_len );
 
     my $obj = __PACKAGE__->new(
@@ -337,8 +340,10 @@ sub __make_scheme {
 }
 
 sub __make_algorithm {
+    my ( $algorithm ) = @_;
 
-    my $algorithm = shift;
+    $algorithm ||= '';
+    local $1;
 
     if ( $algorithm =~ m!^S(.*)$! ) {
         $algorithm = $1;
@@ -364,12 +369,14 @@ sub __make_algorithm {
 }
 
 sub __get_pass_scheme {
-    $_[0] =~ m/{([^}]*)/;
+    local $1;
+    return unless $_[0] =~ m/{([^}]*)/;
     return $1;
 }
 
 sub __get_pass_hash {
-    $_[0] =~ m/}(.*)/;
+    local $1;
+    return unless $_[0] =~ m/}(.*)/;
     return $1;
 }
 
