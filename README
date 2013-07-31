@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Crypt-SaltedHash,
-version 0.08:
+version 0.09:
 
   Perl interface to functions that assist in working
 with salted hashes.

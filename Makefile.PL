@@ -12,6 +12,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl interface to functions that assist in working\r\nwith salted hashes.\r",
   "AUTHOR" => "Sascha Kiefer, L<esskar\@cpan.org>",
   "BUILD_REQUIRES" => {
+    "Test::Fatal" => 0,
     "Test::More" => 0
   },
   "CONFIGURE_REQUIRES" => {
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Digest" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
